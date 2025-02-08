@@ -16,20 +16,23 @@ export const app = new SlackApp({
 // Agents & Assistants
 // -------------------------------
 
-app.assistant(
-  new Assistant({
-    threadStarted: async ({ context: { say, setSuggestedPrompts } }) => {
-      await say({ text: "Hi, how can I help you today?" });
-      await setSuggestedPrompts({
-        prompts: ["What does SLACK stand for?"],
-      });
-    },
-    userMessage: async ({ context: { setStatus, say } }) => {
-      await setStatus({ status: "is typing..." });
-      await say({ text: "Here you are!" });
-    },
-  }),
-);
+// As of 2025/02, you cannot enble Agents & Assistants correctly with manifest.json
+// A workaround is to set the app up using https://api.slack.com/apps website.
+
+// app.assistant(
+//   new Assistant({
+//     threadStarted: async ({ context: { say, setSuggestedPrompts } }) => {
+//       await say({ text: "Hi, how can I help you today?" });
+//       await setSuggestedPrompts({
+//         prompts: ["What does SLACK stand for?"],
+//       });
+//     },
+//     userMessage: async ({ context: { setStatus, say } }) => {
+//       await setStatus({ status: "is typing..." });
+//       await say({ text: "Here you are!" });
+//     },
+//   }),
+// );
 
 // -------------------------------
 // Events API
@@ -77,7 +80,7 @@ app.event("reaction_added", async ({ context: { say }, payload }) => {
 // -------------------------------
 
 app.command(
-  "/run-test-app",
+  "/run-my-edge-app",
   async ({ context: { respond } }) => {
     // ack the request within 3 seconds
     await respond({
@@ -210,35 +213,32 @@ app.view(
 // https://api.slack.com/automation/functions/custom
 // -------------------------------
 
-app.function(
-  "fetch_user_details",
-  async ({ payload, context: { client, functionExecutionId } }) => {
-    try {
-      // Requires users:read scope
-      const userInfo = await client.users.info({
-        user: payload.inputs.user_id,
-      });
-      const user = userInfo.user!;
-      await client.functions.completeSuccess({
-        function_execution_id: functionExecutionId!,
-        outputs: {
-          full_name: user.real_name || user.profile?.real_name_normalized || user.profile?.real_name,
-          icon_url:
-            user.profile?.image_512 ||
-            user.profile?.image_192 ||
-            user.profile?.image_72 ||
-            user.profile?.image_48 ||
-            user.profile?.image_32 ||
-            user.profile?.image_24,
-          tz_offset: user.tz_offset,
-        },
-      });
-    } catch (e) {
-      console.error(e);
-      await client.functions.completeError({
-        function_execution_id: functionExecutionId!,
-        error: `Failed to respond to fetch_user_details function event (${e})`,
-      });
-    }
-  },
-);
+app.function("fetch_user_details", async ({ payload, context: { client, functionExecutionId } }) => {
+  try {
+    // Requires users:read scope
+    const userInfo = await client.users.info({
+      user: payload.inputs.user_id,
+    });
+    const user = userInfo.user!;
+    await client.functions.completeSuccess({
+      function_execution_id: functionExecutionId!,
+      outputs: {
+        full_name: user.real_name || user.profile?.real_name_normalized || user.profile?.real_name,
+        icon_url:
+          user.profile?.image_512 ||
+          user.profile?.image_192 ||
+          user.profile?.image_72 ||
+          user.profile?.image_48 ||
+          user.profile?.image_32 ||
+          user.profile?.image_24,
+        tz_offset: user.tz_offset,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    await client.functions.completeError({
+      function_execution_id: functionExecutionId!,
+      error: `Failed to respond to fetch_user_details function event (${e})`,
+    });
+  }
+});

@@ -1,6 +1,6 @@
 {
   "display_information": {
-    "name": "My Edge App",
+    "name": "slack-edge app template app",
     "description": "You can update this later",
     "background_color": "#4361ba",
     "long_description": ""
@@ -12,7 +12,7 @@
       "messages_tab_read_only_enabled": false
     },
     "bot_user": {
-      "display_name": "My Edge Bot",
+      "display_name": "slack-edge-app-template-bot",
       "always_online": true
     },
     "shortcuts": [
@@ -49,7 +49,8 @@
         "app_mentions:read",
         "reactions:read",
         "channels:history",
-        "groups:history"
+        "groups:history",
+        "im:history"
       ]
     }
   },
@@ -58,7 +59,7 @@
       "is_enabled": true
     },
     "event_subscriptions": {
-      "bot_events": ["app_home_opened", "app_mention", "message.channels", "message.groups", "reaction_added"]
+      "bot_events": ["app_home_opened", "app_mention", "message.channels", "message.groups", "message.im", "reaction_added"]
     },
     "socket_mode_enabled": true,
     "token_rotation_enabled": false
